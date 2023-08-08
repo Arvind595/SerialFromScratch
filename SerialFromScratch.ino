@@ -1,12 +1,14 @@
 //to recieve
-#define datain_clock_pin 1
-#define datain_pin 5
-#define datain_enable_pin 6
+#define datain_clock_pin 2 //output1
+#define datain_pin 4 //output 2
+#define datain_enable_pin 7 //output 3
 
 //to send
-#define dataout_clock_pin 2
-#define dataout_pin 3
-#define dataout_enable_pin 4
+#define dataout_clock_pin 3 //input 5
+#define dataout_pin 5 //input 4
+#define dataout_enable_pin 6 //input 3
+#define spare_pin 9 //input 2
+#define spare_pin 10 //input 1
 
 uint8_t rxbuffer = 0;
 
@@ -22,24 +24,24 @@ void setup() {
   pinMode(datain_pin, INPUT);
   pinMode(datain_enable_pin, INPUT);
 
-  delay(1);
+  delayMicroseconds(1);
 
   digitalWrite(dataout_clock_pin, 0);
   digitalWrite(dataout_enable_pin, 0);
   digitalWrite(dataout_pin, 0);
 
 
-  delay(1);
+  delayMicroseconds(1);
 
   Serial.println("Set");
 }
 
-void pulse_clock(short time = 10) {
+void pulse_clock(short time = 1) {
   //rising edge
   digitalWrite(dataout_clock_pin, 1);
-  delay(time);
+  delayMicroseconds(time);
   digitalWrite(dataout_clock_pin, 0);
-  delay(time);
+  delayMicroseconds(time);
 }
 
 uint8_t read_data(void) {
@@ -58,34 +60,35 @@ uint8_t read_data(void) {
   return data;
 }
 
-void send_data(uint8_t data) {
+void send_data(uint8_t data, uint8_t time) {
 
   for (uint8_t i = 0; i < 8; i++) {
-    if ((data & 0x80) == 1) {
+    if ((data & 0x80)>>7 == 1) {
       digitalWrite(dataout_pin, 1);
     } else digitalWrite(dataout_pin, 0);
+    pulse_clock(time);
+    //delayMicroseconds(time); //
+    data = data << 1;
   }
-
-  data = data << 1;
-  pulse_clock(50);
+  digitalWrite(dataout_pin, 0);
 }
 
 void loop() {
   // To Send
-  uint8_t txbuffer = 0;
+  uint8_t txbuffer = 0xaa;
 
   digitalWrite(dataout_enable_pin, 1);
-  send_data(txbuffer);
+  send_data(txbuffer,1);
   digitalWrite(dataout_enable_pin, 0);
 
-  delay(100);
+  delay(1);
 
-  Serial.println("rxbuffer");
-
+ Serial.println("rxbuffer");
   // To Reviece
   while (digitalRead(datain_enable_pin)) {
     //Serial.println("dataincoming : ")
     rxbuffer = read_data();
-    Serial.println("rxbuffer");
+    
+    Serial.print(rxbuffer);
   }
 }
