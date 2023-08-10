@@ -7,8 +7,8 @@
 #define dataout_clock_pin 3 //input 5
 #define dataout_pin 5 //input 4
 #define dataout_enable_pin 6 //input 3
-#define spare_pin 9 //input 2
-#define spare_pin 10 //input 1
+#define spare_pin1 9 //input 2
+#define spare_pin2 10 //input 1
 
 uint8_t rxbuffer = 0;
 
@@ -19,10 +19,12 @@ void setup() {
   pinMode(dataout_clock_pin, OUTPUT);
   pinMode(dataout_pin, OUTPUT);
   pinMode(dataout_enable_pin, OUTPUT);
+  pinMode(spare_pin1, OUTPUT);
+  pinMode(spare_pin2, OUTPUT);
 
-  pinMode(datain_clock_pin, INPUT);
-  pinMode(datain_pin, INPUT);
-  pinMode(datain_enable_pin, INPUT);
+  pinMode(datain_clock_pin, INPUT_PULLUP);
+  pinMode(datain_pin, INPUT_PULLUP);
+  pinMode(datain_enable_pin, INPUT_PULLUP);
 
   delayMicroseconds(1);
 
